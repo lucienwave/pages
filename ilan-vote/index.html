@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>宜蘭跑旅投票</title>
+<style>
+/* layout: Apple-style product page. Centered headline, generous whitespace, photo cards on a soft grey canvas, frosted ballot bar */
+:root{
+  --bg:#f5f5f7; --card:#ffffff; --ink:#1d1d1f; --muted:#6e6e73; --hair:#d2d2d7;
+  --blue:#0071e3; --blue-soft:rgba(0,113,227,.10); --good:#248a3d; --warn:#b25000; --warn-soft:#fff4e5;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  --display:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang TC","Noto Sans TC",sans-serif;
+  --bar:rgba(255,255,255,.72); color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#000000; --card:#1c1c1e; --ink:#f5f5f7; --muted:#a1a1a6; --hair:#38383a;
+  --blue:#2997ff; --blue-soft:rgba(41,151,255,.16); --good:#30d158; --warn:#ff9f0a; --warn-soft:#2c2111;
+  --bar:rgba(28,28,30,.72); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#000000; --card:#1c1c1e; --ink:#f5f5f7; --muted:#a1a1a6; --hair:#38383a;
+  --blue:#2997ff; --blue-soft:rgba(41,151,255,.16); --good:#30d158; --warn:#ff9f0a; --warn-soft:#2c2111;
+  --bar:rgba(28,28,30,.72); color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.5;padding-bottom:130px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.hero{text-align:center;padding:72px 0 40px}
+.eyebrow{font-size:15px;font-weight:600;color:var(--muted);letter-spacing:.01em}
+h1{font-family:var(--display);font-size:clamp(36px,6.5vw,64px);font-weight:700;letter-spacing:-.02em;line-height:1.06;margin:10px 0 14px;text-wrap:balance}
+.sub{font-size:clamp(17px,2.2vw,21px);color:var(--muted);max-width:40ch;margin:0 auto;text-wrap:balance}
+.facts{display:flex;justify-content:center;flex-wrap:wrap;gap:8px 22px;margin-top:22px;font-size:14px;color:var(--muted)}
+.facts b{color:var(--ink);font-weight:600}
+.status{margin:26px auto 0;max-width:560px;font-size:14px;color:var(--muted)}
+.status.warn{color:var(--warn)}
+
+section{padding:56px 0 8px}
+.sec-head{text-align:center;margin-bottom:26px}
+h2{font-family:var(--display);font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-.015em;margin:0 0 8px}
+.note{font-size:15px;color:var(--muted);max-width:60ch;margin:0 auto}
+.seg{display:inline-flex;margin-top:16px;background:var(--hair);border-radius:999px;padding:3px}
+.seg button{border:0;background:none;font:inherit;font-size:14px;color:var(--ink);padding:6px 16px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.12);font-weight:600}
+
+.results{background:var(--card);border-radius:18px;padding:22px 24px;margin:0 auto 28px;max-width:720px;display:grid;gap:10px}
+.results h3{margin:0 0 4px;font-size:17px;font-weight:600;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.results h3 span{font-weight:400;color:var(--muted);font-size:14px}
+.bar-row{display:grid;grid-template-columns:minmax(100px,200px) 1fr 28px;gap:12px;align-items:center;font-size:14px}
+.bar-row .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track{height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.fill{height:100%;background:var(--blue);border-radius:4px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.cnt{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.who{grid-column:2 / 4;font-size:12px;color:var(--muted);margin-top:-6px}
+.empty{color:var(--muted);font-size:14px;margin:0}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.card{position:relative;background:var(--card);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .25s ease,box-shadow .25s ease;box-shadow:0 0 0 0 transparent}
+.card:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.card input{position:absolute;opacity:0;pointer-events:none}
+.card:has(input:checked){box-shadow:0 0 0 3px var(--blue)}
+.card:has(input:focus-visible){outline:3px solid var(--blue);outline-offset:3px}
+.cover{position:relative;aspect-ratio:16/10;background:var(--hair)}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.tick{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center;color:transparent;font-size:16px;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.card:has(input:checked) .tick{background:var(--blue);color:#fff}
+.badge{position:absolute;top:12px;left:12px;font-size:12px;font-weight:600;background:rgba(255,255,255,.88);color:#1d1d1f;padding:4px 10px;border-radius:999px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px;flex:1}
+.area{font-size:13px;color:var(--muted)}
+.name{font-size:21px;font-weight:700;letter-spacing:-.01em;margin:2px 0 0;line-height:1.25}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:12px 0}
+.stat .k{font-size:12px;color:var(--muted)}
+.stat .v{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.rooms .rt{font-size:12px;color:var(--muted);margin-bottom:4px}
+.rg{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:3px 12px;font-size:14px;align-items:baseline}
+.rg b{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.rooms.none{font-size:14px;color:var(--muted)}
+.meta{font-size:13px;color:var(--muted);margin:0}
+.pc{font-size:14px;margin:0;display:grid;gap:4px}
+.pc .p::before{content:"+  ";color:var(--good);font-weight:700}
+.pc .c::before{content:"−  ";color:var(--warn);font-weight:700}
+.flag{font-size:13px;background:var(--warn-soft);color:var(--ink);border-radius:10px;padding:8px 10px}
+.links{display:flex;gap:18px;flex-wrap:wrap;margin-top:auto;font-size:14px}
+.links a::after{content:" ›"}
+
+.ballots{padding-top:56px}
+.ballots h2{text-align:center;margin-bottom:20px}
+.tbl{overflow-x:auto;background:var(--card);border-radius:18px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:12px 18px;border-bottom:1px solid var(--hair)}
+tr:last-child td{border-bottom:0}
+th{font-size:12px;color:var(--muted);font-weight:500}
+.del{border:0;background:none;color:var(--muted);cursor:pointer;font:inherit;font-size:13px}
+.del:hover{color:var(--warn)}
+.foot{font-size:12px;color:var(--muted);text-align:center;margin:40px 0 0}
+
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--bar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--hair)}
+.bar .wrap{display:flex;gap:12px;align-items:center;padding-top:12px;padding-bottom:12px;flex-wrap:wrap}
+#voter{font:inherit;font-size:15px;padding:10px 14px;border:1px solid var(--hair);border-radius:12px;background:var(--card);color:var(--ink);width:160px}
+.sum{flex:1;min-width:200px;font-size:14px;color:var(--muted);line-height:1.4}
+.sum b{color:var(--ink);font-weight:600}
+#submit{font:inherit;font-size:15px;font-weight:500;background:var(--blue);color:#fff;border:0;border-radius:999px;padding:11px 24px;cursor:pointer}
+#submit:disabled{opacity:.35;cursor:not-allowed}
+#msg{font-size:13px;width:100%;margin:0;color:var(--muted)}
+#msg:empty{display:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:420px){.rg{grid-template-columns:auto 1fr}.bar-row{grid-template-columns:90px 1fr 24px}.hero{padding-top:48px}}
+@media (prefers-reduced-motion:reduce){.fill,.card{transition:none}.card:hover{transform:none}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">ASICS RUN 2027 · 10K · 2/21（日）06:30 · 宜蘭運動公園</div>
+    <h1>住哪裡，吃哪家。</h1>
+    <p class="sub">住宿每人 3 票，餐廳每人 2 票。選好後在下方送出。</p>
+    <div class="facts"><span>入住 <b>2/20（六）一晚</b></span><span><b>3 男 4 女</b>，1 男獨房</span><span>可能加 <b>4 人家庭</b></span></div>
+    <p id="status" class="status">正在連線投票資料…</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="stay">
+    <div class="sec-head">
+      <h2>住宿</h2>
+      <p class="note">每人費用依房型分：整棟總價按床位分給有人住的房間，再除以房內人數。步行與開車時間來自 Google 地圖；品莯、泊野查不到地址，是估算。</p>
+      <div class="seg" role="group" aria-label="人數方案">
+        <button type="button" id="p7" aria-pressed="true">7 人</button>
+        <button type="button" id="p11" aria-pressed="false">11 人（含家庭）</button>
+      </div>
+    </div>
+    <div class="results" id="stayResults"></div>
+    <div class="grid" id="stayGrid"></div>
+  </section>
+
+  <section id="food">
+    <div class="sec-head">
+      <h2>餐廳</h2>
+      <p class="note">如果是比賽前一晚吃，不建議 10 道菜的鐵板燒或生魚片，比賽完再吃比較保險。評分為 2026/11/19 的 Google 地圖資料。</p>
+    </div>
+    <div class="results" id="foodResults"></div>
+    <div class="grid" id="foodGrid"></div>
+  </section>
+
+  <section class="ballots">
+    <h2>誰投了什麼</h2>
+    <div class="tbl"><table><thead><tr><th>名字</th><th>住宿</th><th>餐廳</th><th><span class="sr">操作</span></th></tr></thead><tbody id="ballotRows"></tbody></table></div>
+    <p class="foot">照片取自各房源與食記頁面，點卡片下方連結可看原文。</p>
+  </section>
+</main>
+
+<div class="bar">
+  <div class="wrap">
+    <label class="sr" for="voter">你的名字</label>
+    <input id="voter" maxlength="20" autocomplete="off" placeholder="你的名字">
+    <div class="sum" id="sum">還沒選</div>
+    <button id="submit" type="button" disabled>送出投票</button>
+    <p id="msg" aria-live="polite"></p>
+  </div>
+</div>
+
+<script>
+const STAYS=[
+ {id:"wz-b5",r7:[5415, 2708, 2708],r11:[4932, 2466, "2,466", 1233],mapD:"https://www.google.com/maps/dir/?api=1&origin=%E8%90%AC%E6%BE%A4%E5%A4%A7%E5%9C%B0%20%E5%AE%9C%E8%98%AD%E5%B8%82%E5%BB%BA%E8%98%AD%E5%8C%97%E8%B7%AF313%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=driving",mapW:"https://www.google.com/maps/dir/?api=1&origin=%E8%90%AC%E6%BE%A4%E5%A4%A7%E5%9C%B0%20%E5%AE%9C%E8%98%AD%E5%B8%82%E5%BB%BA%E8%98%AD%E5%8C%97%E8%B7%AF313%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=walking",top:true,name:"萬澤大地・B5 歡樂年華",area:"宜蘭市建業里（縣政特區）",price:21660,p7:3094,p11:2242,walk:"20 分",drive:"3 分",rate:"4.88（43則）",rooms:"5 房，4 間各 2 張單人床＋1 間沙發床；4 獨立衛浴＋1 共用",fam:"可，加價約 3,000",pros:["唯一能走路到會場（1.5 km）","全是單人床，朋友分房不用擠"],cons:["評論數較少"],url:"https://www.airbnb.com.tw/rooms/1328324126437019433"},
+ {id:"pinmo",r7:[1782, 1782, 1114],r11:[1225, 1225, "766", 766],mapD:"https://www.google.com/maps/dir/?api=1&origin=%E5%86%AC%E5%B1%B1%E6%B2%B3%E8%A6%AA%E6%B0%B4%E5%85%AC%E5%9C%92&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=driving",mapW:"https://www.google.com/maps/dir/?api=1&origin=%E5%86%AC%E5%B1%B1%E6%B2%B3%E8%A6%AA%E6%B0%B4%E5%85%AC%E5%9C%92&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=walking",top:true,name:"品莯河岸包棟民宿",area:"五結鄉，冬山河親水公園旁（估）",price:9800,p7:1400,p11:891,walk:"不實際",drive:"21 分",rate:"4.96（157則）",rooms:"4 房 9 床，4 衛浴，可住 16 人以上",fam:"可",pros:["最划算，評論多且高分","KTV、撞球、電動麻將、Switch"],cons:["一定要開車，比賽清晨要自己找停車"],url:"https://www.airbnb.com.tw/rooms/52723340"},
+ {id:"wz-a7",r7:[6128, 3064, 3064],r11:[4456, 2228, "2,228／1,114", 2228],mapD:"https://www.google.com/maps/dir/?api=1&origin=%E8%90%AC%E6%BE%A4%E5%A4%A7%E5%9C%B0%20%E5%AE%9C%E8%98%AD%E5%B8%82%E5%BB%BA%E8%98%AD%E5%8C%97%E8%B7%AF313%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=driving",mapW:"https://www.google.com/maps/dir/?api=1&origin=%E8%90%AC%E6%BE%A4%E5%A4%A7%E5%9C%B0%20%E5%AE%9C%E8%98%AD%E5%B8%82%E5%BB%BA%E8%98%AD%E5%8C%97%E8%B7%AF313%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=walking",top:true,name:"萬澤大地・A7 漫慢森活",area:"宜蘭市建業里（同社區）",price:24510,p7:3501,p11:2228,walk:"20 分",drive:"3 分",rate:"4.95（164則）",rooms:"5 房，4 間各 2 張單人床（1 間另有地墊）＋1 間沙發床；4 衛浴",fam:"可，最多 14 人",pros:["走路到會場","家庭加入時最合適"],cons:["比 B5 貴 2,850"],flag:"9 人以上是否加價，頁面沒寫",url:"https://www.airbnb.com.tw/rooms/1061884688691636894"},
+ {id:"muke",r7:[4860, 4860, 2430],r11:null,mapD:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E5%B8%82%E7%92%B0%E5%B8%82%E6%9D%B1%E8%B7%AF%E4%B8%80%E6%AE%B5585%E5%B7%B712%E5%BC%8410%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=driving",mapW:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E5%B8%82%E7%92%B0%E5%B8%82%E6%9D%B1%E8%B7%AF%E4%B8%80%E6%AE%B5585%E5%B7%B712%E5%BC%8410%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=walking",name:"木可木可民宿",area:"宜蘭市環市東路一段",price:24300,p7:3471,p11:null,walk:"34 分",drive:"5 分",rate:"Agoda 9.0（23則）",rooms:"4 房 8 床，5 衛浴附浴缸",fam:"不行，上限約 10 人",pros:["客廳大、隔音好、水壓強"],cons:["價格跟萬澤差不多，但比較遠、評論少"],url:"https://www.booking.com/hotel/tw/mu-ke-mu-ke-bao-dong-min-su-yi-lan-xian.html"},
+ {id:"pamo",r7:[3000, 1500, 750],r11:[2250, 1125, "563", 563],mapD:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E7%B8%A3%E4%BA%94%E7%B5%90%E9%84%89%E8%A6%AA%E6%B2%B3%E8%B7%AF%E4%B8%80%E6%AE%B542%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=driving",mapW:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E7%B8%A3%E4%BA%94%E7%B5%90%E9%84%89%E8%A6%AA%E6%B2%B3%E8%B7%AF%E4%B8%80%E6%AE%B542%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=walking",name:"帕莫包棟電梯民宿",area:"五結鄉親河路一段",price:9000,p7:1286,p11:818,walk:"不實際",drive:"22 分",rate:"4.9（87則）",rooms:"4 房，每間 2 張雙人床；4.5 衛浴；有電梯",fam:"可，最多 14 人",pros:["最便宜，房東評價好"],cons:["只有路邊停車","以人數計價，加人後價格會變"],url:"https://www.airbnb.com.tw/rooms/684676598868929873"},
+ {id:"bt117",r7:[1960, 1960, 980],r11:[1633, 817, "817", 817],mapD:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E7%B8%A3%E7%BE%85%E6%9D%B1%E9%8E%AE%E5%8C%97%E6%8A%95%E8%A1%97117%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=driving",mapW:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E7%B8%A3%E7%BE%85%E6%9D%B1%E9%8E%AE%E5%8C%97%E6%8A%95%E8%A1%97117%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=walking",name:"羅東北投117 包棟別墅",area:"羅東鎮北投街",price:9800,p7:1400,p11:891,walk:"不實際",drive:"18 分",rate:"4.93（97則）",rooms:"4 房 6 張小雙人床，每房獨立衛浴",fam:"可，12 人方案",pros:["庭院可停 5 台車","離羅東火車站最近"],cons:["床都是小型雙人床"],flag:"原連結入住日是 2/21，2/20 價格要重查",url:"https://www.airbnb.com.tw/rooms/19076835"},
+ {id:"suixin",r7:[2640, 2640, 1320],r11:[1886, 1886, "943", 943],mapD:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E7%B8%A3%E4%BA%94%E7%B5%90%E9%84%89%E5%A4%A7%E5%90%89%E6%9D%91%E5%A4%A7%E5%90%89%E4%B8%80%E8%B7%AF325%E5%B7%B7102%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=driving",mapW:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E7%B8%A3%E4%BA%94%E7%B5%90%E9%84%89%E5%A4%A7%E5%90%89%E6%9D%91%E5%A4%A7%E5%90%89%E4%B8%80%E8%B7%AF325%E5%B7%B7102%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=walking",name:"穗心所寓 Inn 民宿",area:"五結鄉大吉村",price:13200,p7:1886,p11:1200,walk:"不實際",drive:"14 分",rate:"5.0（僅 1 則）",rooms:"5 房，每房獨立衛浴與陽台",fam:"可，最多 14 人",pros:["房型最好分配"],cons:["新房源幾乎沒評論"],url:"https://www.airbnb.com.tw/rooms/1729011540181042870"},
+ {id:"daoxiang",r7:[4500, 2250, 2250],r11:null,mapD:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E7%B8%A3%E4%BA%94%E7%B5%90%E9%84%89%E5%A4%A7%E7%9C%BE%E4%B8%80%E8%B7%AF439%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=driving",mapW:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E7%B8%A3%E4%BA%94%E7%B5%90%E9%84%89%E5%A4%A7%E7%9C%BE%E4%B8%80%E8%B7%AF439%E8%99%9F&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=walking",name:"水稻輕旅行 稻香",area:"五結鄉，傳藝中心附近",price:18000,p7:2571,p11:null,walk:"不實際",drive:"19 分",rate:"Agoda 9.5（40則）",rooms:"5 間雙人房，只有 2.5 間衛浴",fam:"不行，上限 10 人",pros:["乾淨、隔音好"],cons:["熱水不足要等","衛浴少，比賽早上會排隊"],url:"https://www.airbnb.com.tw/rooms/46840558"},
+ {id:"boye",r7:[6764, 4509, 2255],r11:[4960, 3307, "1,653", 1653],mapD:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E7%B8%A3%E5%86%AC%E5%B1%B1%E9%84%89%E7%8F%8D%E7%8F%A0%E6%9D%91&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=driving",mapW:"https://www.google.com/maps/dir/?api=1&origin=%E5%AE%9C%E8%98%AD%E7%B8%A3%E5%86%AC%E5%B1%B1%E9%84%89%E7%8F%8D%E7%8F%A0%E6%9D%91&destination=%E5%AE%9C%E8%98%AD%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92&travelmode=walking",name:"冬山泊野私人會所",area:"冬山鄉珍珠村（估）",price:24800,p7:3543,p11:2255,walk:"不實際",drive:"22 分",rate:"4.83（29則）",rooms:"4 房 9 床，4 衛浴，有泳池",fam:"可，最多 16 人",pros:["設施最多：泳池、KTV、電玩"],cons:["最貴也最遠，2 月用不到泳池"],flag:"頁面寫週六 14 人 29,800，跟報價 24,800 對不上",url:"https://www.airbnb.com.tw/rooms/1511232387435323966"}
+];
+const FOODS=[
+ {id:"haochun",top:true,name:"好春好然",area:"員山鄉深洲二路",type:"無菜單台菜桌菜",cost:"約 680–1,080",rate:"4.6（1,077則）",off:"週二、三",pros:["10 人桌菜，人數剛好","自家種的當季蔬菜"],cons:["要提早一個月訂位","只有一位廚師"],url:"https://travel.yam.com/article/132458"},
+ {id:"muze",top:true,name:"沐澤鐵板燒",area:"宜蘭市女中路三段",type:"無菜單鐵板燒",cost:"990",rate:"4.9（410則）",off:"週一",pros:["5 家中評分最高、最便宜","不收服務費"],cons:["只收現金"],flag:"店小，要先問能不能一次坐下全部人",url:"https://yuhhuey1.pixnet.net/blog/posts/12226441051"},
+ {id:"xiangyan",top:true,name:"饗宴鐵板燒",area:"五結鄉溪濱路",type:"無菜單鐵板燒",cost:"1,990 起＋10%",rate:"4.6（4,553則）",off:"無",pros:["名氣最大、評論最多","師傅互動、甜點好評"],cons:["最貴也最遠"],url:"https://vocus.cc/article/673593d5fd89780001da5069"},
+ {id:"changcang",name:"嚐藏私廚",area:"員山鄉惠深二路（已搬遷）",type:"西式無菜單",cost:"午 550 起；晚單點 850–1,100",rate:"4.7（406則）",off:"週一、二",pros:["小牛肋是招牌","氣氛像私廚"],cons:["座位少","作者覺得晚餐偏貴"],url:"https://melissalife.net/hide-restaurant/"},
+ {id:"guangwu",name:"光武生活館",area:"運動公園對面",type:"無菜單海鮮",cost:"1,000–1,400＋10%",rate:"4.2（1,636則）",off:"週二",pros:["就在會場對面，有停車場","空間大，適合團體"],cons:["5 家評分最低，有人說不值"],url:"https://kikimilk2.pixnet.net/blog/posts/15335452125"}
+];
+
+const ALL={};STAYS.forEach(s=>ALL[s.id]=s.name);FOODS.forEach(f=>ALL[f.id]=f.name);
+let per=7, ballots=[], db=null, canWrite=true;
+const LIMIT={stay:3,food:2};
+const picks=k=>[...document.querySelectorAll(`input[name=${k}]:checked`)].map(i=>i.value);
+const listOf=(b,k)=>Array.isArray(b[k+"s"])?b[k+"s"]:(b[k]?[b[k]]:[]);
+const $=id=>document.getElementById(id);
+const fmt=n=>n.toLocaleString("zh-TW");
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]))}
+
+function roomTable(s){
+  const r = per===7? s.r7 : s.r11;
+  if(!r) return `<div class="rooms none">11 人住不下</div>`;
+  const n=v=>typeof v==="number"?fmt(v):esc(v);
+  return `<div class="rooms"><div class="rt">每人費用（依房型）</div><div class="rg">
+    <span>男生獨房</span><b>${n(r[0])}</b><span>2 男同房</span><b>${n(r[1])}</b><span>女生</span><b>${n(r[2])}</b>${per===11?`<span>家庭</span><b>${n(r[3])}</b>`:""}</div></div>`;
+}
+function cover(id,name,top){
+  return `<div class="cover"><img src="img/${id}.jpg" alt="${esc(name)}" loading="lazy" width="720" height="450">${top?'<span class="badge">推薦</span>':''}<span class="tick" aria-hidden="true">✓</span></div>`;
+}
+function pc(o){return `<div class="pc">${o.pros.map(p=>`<span class="p">${esc(p)}</span>`).join("")}${o.cons.map(c=>`<span class="c">${esc(c)}</span>`).join("")}</div>`}
+function stayCard(s){
+  return `<label class="card"><input type="checkbox" name="stay" value="${s.id}" id="st-${s.id}">
+  ${cover(s.id,s.name,s.top)}
+  <div class="body">
+    <div><div class="area">${esc(s.area)}</div><p class="name">${esc(s.name)}</p></div>
+    <div class="stats">
+      <div class="stat"><div class="k">總價／晚</div><div class="v">${fmt(s.price)}</div></div>
+      <div class="stat"><div class="k">步行到會場</div><div class="v">${esc(s.walk)}</div></div>
+      <div class="stat"><div class="k">開車到會場</div><div class="v">${esc(s.drive)}</div></div>
+    </div>
+    ${roomTable(s)}
+    <p class="meta">評分 ${esc(s.rate)} · ${esc(s.rooms)} · 家庭加入：${esc(s.fam)}</p>
+    ${pc(s)}
+    ${s.flag?`<div class="flag">待確認：${esc(s.flag)}</div>`:""}
+    <div class="links"><a href="${s.mapD}" target="_blank" rel="noopener">開車路線</a><a href="${s.mapW}" target="_blank" rel="noopener">步行路線</a><a href="${s.url}" target="_blank" rel="noopener">房源頁面</a></div>
+  </div></label>`;
+}
+function foodCard(f){
+  return `<label class="card"><input type="checkbox" name="food" value="${f.id}" id="fd-${f.id}">
+  ${cover(f.id,f.name,f.top)}
+  <div class="body">
+    <div><div class="area">${esc(f.area)} · ${esc(f.type)}</div><p class="name">${esc(f.name)}</p></div>
+    <div class="stats">
+      <div class="stat"><div class="k">每人 NT$</div><div class="v">${esc(f.cost)}</div></div>
+      <div class="stat"><div class="k">Google 評分</div><div class="v">${esc(f.rate)}</div></div>
+      <div class="stat"><div class="k">公休</div><div class="v">${esc(f.off)}</div></div>
+    </div>
+    ${pc(f)}
+    ${f.flag?`<div class="flag">待確認：${esc(f.flag)}</div>`:""}
+    <div class="links"><a href="${f.url}" target="_blank" rel="noopener">看食記</a></div>
+  </div></label>`;
+}
+function renderCards(){
+  const st=picks("stay");
+  $("stayGrid").innerHTML=STAYS.map(stayCard).join("");
+  st.forEach(id=>$("st-"+id).checked=true);
+}
+function tally(list,key,el){
+  const counts={}, names={};
+  list.forEach(o=>{counts[o.id]=0;names[o.id]=[]});
+  let total=0;
+  ballots.forEach(b=>{ const arr=listOf(b,key); if(arr.length) total++; arr.forEach(id=>{ if(counts[id]!==undefined){counts[id]++;names[id].push(b.name)} }) });
+  const max=Math.max(1,...Object.values(counts));
+  const rows=[...list].sort((a,b)=>counts[b.id]-counts[a.id]);
+  el.innerHTML=`<h3>即時票數 <span>${total} 人已投 · 每人 ${LIMIT[key]} 票</span></h3>`+(total?rows.map(o=>`<div class="bar-row"><span class="nm">${esc(o.name)}</span><div class="track"><div class="fill" style="width:${counts[o.id]/max*100}%"></div></div><span class="cnt">${counts[o.id]}</span>${names[o.id].length?`<span class="who">${names[o.id].map(esc).join("、")}</span>`:""}</div>`).join(""):`<p class="empty">還沒有人投票。</p>`);
+}
+function renderResults(){
+  tally(STAYS,"stay",$("stayResults"));
+  tally(FOODS,"food",$("foodResults"));
+  const rows=[...ballots].sort((a,b)=>(b.at||0)-(a.at||0));
+  $("ballotRows").innerHTML=rows.length?rows.map(b=>`<tr><td>${esc(b.name)}</td><td>${esc(listOf(b,"stay").map(id=>ALL[id]).join("、")||"—")}</td><td>${esc(listOf(b,"food").map(id=>ALL[id]).join("、")||"—")}</td><td>${canWrite&&db?`<button class="del" data-id="${esc(b._id)}">刪除</button>`:""}</td></tr>`).join(""):`<tr><td colspan="4" class="empty">還沒有人投票</td></tr>`;
+}
+function updateBar(){
+  const st=picks("stay"), fd=picks("food");
+  const nm=$("voter").value.trim();
+  $("sum").innerHTML = `住宿 <b>${st.length}/3</b>　餐廳 <b>${fd.length}/2</b>` + (st.length||fd.length?`<br>${esc([...st,...fd].map(id=>ALL[id]).join("、"))}`:"");
+  $("submit").disabled=!(nm && (st.length||fd.length));
+}
+function keyFor(name){let h=2166136261;for(const ch of name){h^=ch.codePointAt(0);h=Math.imul(h,16777619)>>>0}return "n-"+h.toString(16)}
+function setStatus(text,warn){const s=$("status");s.textContent=text;s.className="status"+(warn?" warn":"")}
+function offline(){
+  canWrite=false; $("submit").textContent="複製我的選擇";
+  setStatus("你目前沒有投票權限。選好後按「複製我的選擇」，貼到 LINE 群組。",true);
+  renderResults();
+}
+function setPer(n){per=n;$("p7").setAttribute("aria-pressed",String(n===7));$("p11").setAttribute("aria-pressed",String(n===11));renderCards();updateBar()}
+$("p7").onclick=()=>setPer(7); $("p11").onclick=()=>setPer(11);
+document.addEventListener("change",e=>{
+  const k=e.target.name; if(k!=="stay"&&k!=="food") return;
+  $("msg").textContent="";
+  if(e.target.checked && picks(k).length>LIMIT[k]){ e.target.checked=false; $("msg").textContent=(k==="stay"?"住宿最多 3 票":"餐廳最多 2 票")+"，要換的話先取消一個。"; }
+  updateBar();
+});
+$("voter").addEventListener("input",updateBar);
+try{const saved=localStorage.getItem("ilan-voter");if(saved)$("voter").value=saved}catch(e){}
+
+$("submit").onclick=async()=>{
+  const name=$("voter").value.trim().slice(0,20);
+  const stays=picks("stay"), foods=picks("food");
+  try{localStorage.setItem("ilan-voter",name)}catch(e){}
+  if(!db||!canWrite){
+    const text=`${name}：住宿投「${stays.map(id=>ALL[id]).join("、")||"未選"}」，餐廳投「${foods.map(id=>ALL[id]).join("、")||"未選"}」`;
+    try{await navigator.clipboard.writeText(text);$("msg").textContent="已複製，貼到 LINE 群組就好。"}catch(e){$("msg").textContent="無法自動複製，請手動複製："+text}
+    return;
+  }
+  $("submit").disabled=true; $("msg").textContent="送出中…";
+  try{
+    await db.doc("ballots/"+keyFor(name)).set({name,stays,foods,at:Date.now()});
+    $("msg").textContent=`已記下 ${name} 的票。用同一個名字再送一次就能改。`;
+  }catch(e){
+    if(e&&e.code==="invalid_argument"){offline();$("msg").textContent="這個帳號不能寫入投票，已切換成複製模式。"}
+    else $("msg").textContent="送出失敗，請稍後再試一次。";
+  }
+  updateBar();
+};
+document.addEventListener("click",async e=>{
+  const b=e.target.closest(".del"); if(!b||!db) return;
+  try{await db.doc("ballots/"+b.dataset.id).delete()}catch(err){$("msg").textContent="刪除失敗，可能沒有權限。"}
+});
+
+renderCards(); $("foodGrid").innerHTML=FOODS.map(foodCard).join(""); renderResults(); updateBar();
+
+(async()=>{
+  let timer=setTimeout(()=>{ if(!db) offline(); else setStatus("投票資料暫時連不上，票數可能不是最新。",true)},10000);
+  try{ db = window.claude ? await window.claude.use("db") : null }catch(e){ db=null }
+  if(!db){clearTimeout(timer);offline();return}
+  try{const u=await window.claude.use("user"); const w=u&&u.can?await u.can("data.write"):null; if(w===false){canWrite=false}}catch(e){}
+  db.collection("ballots").onSnapshot(snap=>{
+    ballots=snap.docs.filter(d=>d.exists).map(d=>({...d.data(),_id:d.id}));
+    if(!snap.metadata.fromCache){clearTimeout(timer);
+      if(canWrite) setStatus("投票已連線，票數即時更新。");
+      else {setStatus("你可以看票數，但這個帳號不能投票。選好後按「複製我的選擇」貼到 LINE 群組。",true);$("submit").textContent="複製我的選擇"}}
+    renderResults();
+  },err=>{clearTimeout(timer);offline()});
+})();
+</script>
+</body>
+</html>
